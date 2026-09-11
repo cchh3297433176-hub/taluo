@@ -37,34 +37,46 @@ body::before {
 
 .app-container {
   position:relative; z-index:1;
-  max-width:680px; margin:0 auto; padding:24px 18px 60px;
+  max-width:680px; margin:0 auto; padding:18px 16px 60px;
   min-height:100vh; display:flex; flex-direction:column;
 }
 
-/* Header */
+/* 顶部导航：左右对称、标题舒展 */
 .app-header {
-  text-align:center; padding:16px 0 10px; position:relative;
+  padding:10px 0 14px; position:relative;
 }
-.app-header h1 {
-  font-size:1.85rem; font-weight:700; color:var(--purple-glow); letter-spacing:3px;
+.app-header-nav {
+  display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:12px;
 }
-.app-header .subtitle {
-  font-size:.86rem; color:var(--text-sub); margin-top:6px; letter-spacing:1.5px;
+/* 左侧高质感纯白退出按钮 */
+.top-back-btn {
+  background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.3);
+  color:#ffffff; padding:5px 14px; border-radius:20px;
+  font-size:.78rem; font-weight:600; cursor:pointer; transition:all .2s;
+  display:inline-flex; align-items:center; gap:4px; letter-spacing:1px;
 }
-.divider {
-  width:50px; height:2px; background:var(--purple-glow); margin:12px auto 0; border-radius:1px; opacity:0.8;
+.top-back-btn:active {
+  background:rgba(255,255,255,0.2); transform:scale(0.96);
 }
-
-/* 右上角纯白高级设置按钮（无退出按钮、无原生控件） */
+/* 右侧高级星轨设置按钮 */
 .top-mystic-btn {
-  position:absolute; top:12px; right:0;
-  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.25);
-  color:#ffffff; padding:5px 12px; border-radius:20px;
-  font-size:.76rem; cursor:pointer; transition:all .2s;
-  display:inline-flex; align-items:center; gap:5px; letter-spacing:1px;
+  background:rgba(255,255,255,0.08); border:1px solid rgba(212,175,55,0.4);
+  color:var(--gold-text); padding:5px 12px; border-radius:20px;
+  font-size:.78rem; font-weight:600; cursor:pointer; transition:all .2s;
+  display:inline-flex; align-items:center; gap:4px; letter-spacing:1px;
 }
 .top-mystic-btn:active {
-  background:rgba(255,255,255,0.15); border-color:#ffffff;
+  background:rgba(212,175,55,0.2); transform:scale(0.96);
+}
+
+.app-header h1 {
+  font-size:1.9rem; font-weight:700; color:var(--purple-glow); letter-spacing:4px; text-align:center;
+}
+.app-header .subtitle {
+  font-size:.88rem; color:var(--text-sub); margin-top:4px; letter-spacing:1.5px; text-align:center;
+}
+.divider {
+  width:50px; height:2px; background:var(--purple-glow); margin:10px auto 0; border-radius:1px; opacity:0.8;
 }
 
 /* 阶段容器 */
@@ -73,24 +85,24 @@ body::before {
 
 /* 欢迎主屏 */
 .welcome-content {
-  text-align:center; padding:20px 10px; width:100%;
+  text-align:center; padding:16px 10px; width:100%;
 }
 .welcome-diamond {
-  font-size:2rem; margin:16px auto; color:var(--purple-glow);
-  filter:drop-shadow(0 0 10px rgba(185,142,255,0.5));
+  font-size:2.2rem; margin:14px auto; color:var(--purple-glow);
+  filter:drop-shadow(0 0 12px rgba(185,142,255,0.5));
 }
 .welcome-content h2 {
-  font-size:1.45rem; color:#ffffff; margin-bottom:12px; letter-spacing:1.5px;
+  font-size:1.45rem; color:#ffffff; margin-bottom:10px; letter-spacing:1.5px;
 }
 .welcome-content p {
-  color:var(--text-sub); font-size:.9rem; line-height:1.8; margin-bottom:20px;
+  color:var(--text-sub); font-size:.9rem; line-height:1.8; margin-bottom:18px;
 }
 .welcome-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:20px 0 28px;
+  display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0 24px;
 }
 .welcome-card {
   background:var(--bg-card); border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px; padding:18px 12px; text-align:center;
+  border-radius:14px; padding:16px 12px; text-align:center;
 }
 .wc-num { font-size:1.15rem; font-weight:700; color:var(--purple-glow); margin-bottom:4px; font-family:serif; }
 .wc-label { font-size:.82rem; color:var(--text-main); }
@@ -135,7 +147,7 @@ body::before {
 }
 .user-q-input:focus { border-color:var(--purple-glow); }
 
-/* 卡牌展示与 card_back.png 翻转 */
+/* 卡牌翻转 */
 .tarot-spread-row {
   display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:24px 0;
 }
@@ -180,9 +192,7 @@ body::before {
   background:rgba(255,255,255,0.03); border-radius:0 8px 8px 0;
 }
 
-/* ============================================================ */
-/* ✦ 纯 CSS 自渲染黑金神秘折叠设置弹窗（彻底杜绝系统丑陋白底 Dialog） ✦ */
-/* ============================================================ */
+/* 黑金自渲染折叠弹窗 */
 .mystic-modal-mask {
   position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999;
   display:none; align-items:center; justify-content:center; padding:16px;
@@ -203,7 +213,6 @@ body::before {
   display:block; font-size:.78rem; color:var(--text-sub); margin-bottom:6px; letter-spacing:.5px;
 }
 
-/* 自定义下拉触发头 */
 .custom-drop-header {
   width:100%; background:#090a10; border:1px solid rgba(212,175,55,0.35);
   border-radius:10px; color:#f6f2e8; padding:10px 12px; font-size:.85rem;
@@ -214,12 +223,11 @@ body::before {
 .custom-drop-arrow { font-size:10px; color:var(--gold-text); transition:transform .2s; }
 .custom-drop-header.open .custom-drop-arrow { transform:rotate(180deg); }
 
-/* 自定义下拉展开面板 */
 .custom-drop-menu {
   position:absolute; top:calc(100% + 4px); left:0; right:0;
   background:#141722; border:1px solid rgba(212,175,55,0.4);
   border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.9);
-  max-height:160px; overflow-y:auto; z-index:100;
+  max-height:170px; overflow-y:auto; z-index:100;
   display:none; flex-direction:column; padding:4px;
 }
 .custom-drop-menu.open { display:flex; }
@@ -235,7 +243,6 @@ body::before {
   display:flex; justify-content:flex-end; gap:10px; margin-top:22px;
 }
 
-/* Footer */
 .app-footer {
   text-align:center; padding:24px 0 10px; color:var(--text-muted); font-size:.74rem;
   margin-top:auto; letter-spacing:1px;
@@ -246,7 +253,12 @@ body::before {
 
 <div class="app-container">
   <header class="app-header">
-    <button class="top-mystic-btn" onclick="openMysticSettings()">✦ 星轨设置 ✦</button>
+    <div class="app-header-nav">
+      <!-- 🌟 纯白高级退出按键 -->
+      <button class="top-back-btn" onclick="exitToDesktop()">← 退出</button>
+      <!-- 🌟 右上角星轨设置 -->
+      <button class="top-mystic-btn" onclick="openMysticSettings()">✦ 星轨设置 ✦</button>
+    </div>
     <h1>塔罗牌占卜</h1>
     <p class="subtitle">倾听内心的声音，照亮前行的路</p>
     <div class="divider"></div>
@@ -367,6 +379,15 @@ body::before {
 </div>
 
 <script>
+// ==================== 退出回桌面 ====================
+function exitToDesktop() {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = '../index.html';
+  }
+}
+
 // ==================== 牌库数据 ====================
 const MAJOR = [
   { id:0, name:'愚者', img:'0.jpg', up:'纯粹初心·无畏冒险·新的可能', rev:'鲁莽冲动·缺乏方向·天真过头' },
@@ -508,7 +529,7 @@ function showResultReadings() {
   box.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-// 自动读取主系统 API 接口
+// 自动穿透读取主系统 API 接口
 function getActiveAIConfig() {
   try {
     const raw = localStorage.getItem('mcyt_ai_config');
@@ -527,7 +548,7 @@ function getActiveAIConfig() {
 async function invokeAIReading() {
   const cfg = getActiveAIConfig();
   if (!cfg.apiKey) {
-    alert('请在主系统设置中配置大模型 API Key！');
+    alert('请在主游戏系统设置中配置大模型 API Key！');
     return;
   }
 
@@ -574,9 +595,7 @@ function resetAll() {
   goStage('welcome');
 }
 
-// ============================================================
-// ✦ 黑金自渲染下拉交互逻辑（防原生白框） ✦
-// ============================================================
+// ==================== 自渲染黑金折叠设置面板 ====================
 let pendingConfig = {
   widgetEnabled: 'true',
   widgetSpread: 'triple',
@@ -626,7 +645,7 @@ function openMysticSettings() {
   document.getElementById('widgetEnabledValText').textContent = wEnabled ? '开启显示（推荐）' : '隐藏组件';
   document.getElementById('widgetSpreadValText').textContent = (wSpread === 'triple') ? '三张牌阵（过去·现在·未来）' : '单张牌阵（每日核心启示）';
 
-  // 🌟 真实抓取主系统已保存的备注配置
+  // 🌟 真实多轨深度抓取主系统保存的所有备注预设！
   const menu = document.getElementById('aiProfileMenu');
   menu.innerHTML = '';
 
@@ -639,22 +658,25 @@ function openMysticSettings() {
 
   let activeLabel = `主系统配置 (${mainCfg.model || '未设定'})`;
 
+  // 兼容 mcyt_saved_models 与 mcyt_saved_models_v2
+  let rawList = null;
   try {
-    const raw = localStorage.getItem('mcyt_saved_models_v2');
-    if (raw) {
-      const list = JSON.parse(raw);
-      if (Array.isArray(list) && list.length) {
-        list.forEach((p, idx) => {
-          let item = document.createElement('div');
-          item.className = 'custom-drop-item';
-          const title = `${p.name || ('配置' + (idx+1))} · ${p.model}`;
-          item.textContent = title;
-          item.onclick = () => selectDropVal('aiProfile', idx.toString(), title);
-          menu.appendChild(item);
-        });
-      }
-    }
+    const raw1 = localStorage.getItem('mcyt_saved_models');
+    const raw2 = localStorage.getItem('mcyt_saved_models_v2');
+    rawList = raw1 ? JSON.parse(raw1) : (raw2 ? JSON.parse(raw2) : null);
   } catch (_) {}
+
+  if (Array.isArray(rawList) && rawList.length) {
+    rawList.forEach((p, idx) => {
+      let item = document.createElement('div');
+      item.className = 'custom-drop-item';
+      const displayName = p.name || p.modelName || p.model || ('预设 ' + (idx + 1));
+      const title = `备注：${displayName} (${p.model || '未知模型'})`;
+      item.textContent = title;
+      item.onclick = () => selectDropVal('aiProfile', idx.toString(), title);
+      menu.appendChild(item);
+    });
+  }
 
   document.getElementById('aiProfileValText').textContent = activeLabel;
   modal.style.display = 'flex';
@@ -669,18 +691,21 @@ function saveMysticSettings() {
   localStorage.setItem('mcyt_widget_tarot_spread', pendingConfig.widgetSpread);
 
   if (pendingConfig.aiProfileIndex !== 'default') {
+    let rawList = null;
     try {
-      const raw = localStorage.getItem('mcyt_saved_models_v2');
-      if (raw) {
-        const list = JSON.parse(raw);
-        const p = list[parseInt(pendingConfig.aiProfileIndex, 10)];
-        if (p) {
-          localStorage.setItem('tarot_ai_base_url', p.baseUrl || '');
-          localStorage.setItem('tarot_ai_api_key', p.apiKey || '');
-          localStorage.setItem('tarot_ai_model', p.model || '');
-        }
-      }
+      const raw1 = localStorage.getItem('mcyt_saved_models');
+      const raw2 = localStorage.getItem('mcyt_saved_models_v2');
+      rawList = raw1 ? JSON.parse(raw1) : (raw2 ? JSON.parse(raw2) : null);
     } catch (_) {}
+
+    if (Array.isArray(rawList)) {
+      const p = rawList[parseInt(pendingConfig.aiProfileIndex, 10)];
+      if (p) {
+        localStorage.setItem('tarot_ai_base_url', p.baseUrl || '');
+        localStorage.setItem('tarot_ai_api_key', p.apiKey || '');
+        localStorage.setItem('tarot_ai_model', p.model || '');
+      }
+    }
   } else {
     localStorage.removeItem('tarot_ai_base_url');
     localStorage.removeItem('tarot_ai_api_key');
