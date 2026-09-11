@@ -9,7 +9,7 @@
 :root {
   --bg: #08090d;
   --bg-card: #10121a;
-  --border-gold: rgba(212, 175, 55, 0.4);
+  --border-gold: rgba(212, 175, 55, 0.45);
   --gold-text: #f4d06f;
   --purple-glow: #b98eff;
   --purple-deep: #241432;
@@ -20,7 +20,7 @@
   --radius: 12px;
   --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body {
   width:100%; min-height:100vh;
   background:var(--bg); color:var(--text-main);
@@ -28,7 +28,6 @@ html, body {
   overflow-x:hidden;
 }
 
-/* 背景隐约漫射星芒 */
 body::before {
   content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.03;
   background-image:
@@ -56,7 +55,7 @@ body::before {
   width:50px; height:2px; background:var(--purple-glow); margin:12px auto 0; border-radius:1px; opacity:0.8;
 }
 
-/* 右上角纯白高级设置按钮（无退出、无 emoji） */
+/* 右上角纯白高级设置按钮（无退出按钮、无原生控件） */
 .top-mystic-btn {
   position:absolute; top:12px; right:0;
   background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.25);
@@ -68,11 +67,11 @@ body::before {
   background:rgba(255,255,255,0.15); border-color:#ffffff;
 }
 
-/* Stages */
+/* 阶段容器 */
 .stage { display:none; flex-direction:column; align-items:center; flex:1; width:100%; }
 .stage.active { display:flex; }
 
-/* Welcome Stage */
+/* 欢迎主屏 */
 .welcome-content {
   text-align:center; padding:20px 10px; width:100%;
 }
@@ -96,7 +95,7 @@ body::before {
 .wc-num { font-size:1.15rem; font-weight:700; color:var(--purple-glow); margin-bottom:4px; font-family:serif; }
 .wc-label { font-size:.82rem; color:var(--text-main); }
 
-/* Buttons */
+/* 按钮通用 */
 .btn {
   display:inline-flex; align-items:center; justify-content:center;
   padding:12px 32px; border-radius:12px; font-size:.92rem;
@@ -114,7 +113,7 @@ body::before {
 }
 .btn-gold:active { transform:scale(0.98); background:#150e09; }
 
-/* Scenario & Spread Selectors */
+/* 场景与牌阵 */
 .scenario-grid {
   display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; width:100%; margin:16px 0;
 }
@@ -136,7 +135,7 @@ body::before {
 }
 .user-q-input:focus { border-color:var(--purple-glow); }
 
-/* Tarot Cards Display & Card Back (采用用户新图 card_back.png) */
+/* 卡牌展示与 card_back.png 翻转 */
 .tarot-spread-row {
   display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:24px 0;
 }
@@ -170,7 +169,7 @@ body::before {
   border-top:1px solid rgba(212,175,55,0.2);
 }
 
-/* Reading Panel */
+/* 解读区 */
 .reading-box {
   background:var(--bg-card); border:1px solid rgba(255,255,255,0.12);
   border-radius:14px; padding:18px; width:100%; margin-top:20px;
@@ -181,29 +180,59 @@ body::before {
   background:rgba(255,255,255,0.03); border-radius:0 8px 8px 0;
 }
 
-/* 黑金神秘风格设置弹窗（无手填 API Key，直接选主系统备注） */
+/* ============================================================ */
+/* ✦ 纯 CSS 自渲染黑金神秘折叠设置弹窗（彻底杜绝系统丑陋白底 Dialog） ✦ */
+/* ============================================================ */
 .mystic-modal-mask {
   position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999;
   display:none; align-items:center; justify-content:center; padding:16px;
-  backdrop-filter:blur(6px);
+  backdrop-filter:blur(8px);
 }
 .mystic-modal-box {
-  background:#11131a; border:1.5px solid var(--border-gold); border-radius:16px;
-  max-width:440px; width:100%; padding:22px; box-shadow:0 12px 40px rgba(0,0,0,0.8);
+  background:#11131b; border:1.5px solid var(--border-gold); border-radius:18px;
+  max-width:440px; width:100%; padding:22px 18px; box-shadow:0 16px 48px rgba(0,0,0,0.85);
 }
 .mm-title {
-  font-size:1.05rem; font-weight:700; color:var(--gold-text); text-align:center;
-  letter-spacing:1.5px; margin-bottom:16px;
+  font-size:1.1rem; font-weight:700; color:var(--gold-text); text-align:center;
+  letter-spacing:2px; margin-bottom:18px;
 }
-.mm-row { margin-bottom:14px; }
-.mm-label { display:block; font-size:.8rem; color:var(--text-sub); margin-bottom:5px; }
-.mm-select {
-  width:100%; background:#090a0f; border:1px solid rgba(255,255,255,0.18);
-  border-radius:8px; color:#f6f2e8; padding:8px 10px; font-size:.82rem; outline:none;
+.mm-group {
+  margin-bottom:16px; position:relative;
 }
-.mm-select:focus { border-color:var(--gold-text); }
+.mm-label {
+  display:block; font-size:.78rem; color:var(--text-sub); margin-bottom:6px; letter-spacing:.5px;
+}
+
+/* 自定义下拉触发头 */
+.custom-drop-header {
+  width:100%; background:#090a10; border:1px solid rgba(212,175,55,0.35);
+  border-radius:10px; color:#f6f2e8; padding:10px 12px; font-size:.85rem;
+  display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; user-select:none; transition:border-color .2s;
+}
+.custom-drop-header:active { border-color:var(--gold-text); }
+.custom-drop-arrow { font-size:10px; color:var(--gold-text); transition:transform .2s; }
+.custom-drop-header.open .custom-drop-arrow { transform:rotate(180deg); }
+
+/* 自定义下拉展开面板 */
+.custom-drop-menu {
+  position:absolute; top:calc(100% + 4px); left:0; right:0;
+  background:#141722; border:1px solid rgba(212,175,55,0.4);
+  border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.9);
+  max-height:160px; overflow-y:auto; z-index:100;
+  display:none; flex-direction:column; padding:4px;
+}
+.custom-drop-menu.open { display:flex; }
+.custom-drop-item {
+  padding:9px 12px; border-radius:6px; font-size:.82rem; color:#f6f2e8;
+  cursor:pointer; transition:background .15s; user-select:none;
+}
+.custom-drop-item:active, .custom-drop-item.selected {
+  background:rgba(212,175,55,0.15); color:var(--gold-text); font-weight:600;
+}
+
 .mm-btns {
-  display:flex; justify-content:flex-end; gap:10px; margin-top:20px;
+  display:flex; justify-content:flex-end; gap:10px; margin-top:22px;
 }
 
 /* Footer */
@@ -223,7 +252,7 @@ body::before {
     <div class="divider"></div>
   </header>
 
-  <!-- 阶段 0：欢迎主屏（完全还原图五） -->
+  <!-- 阶段 0：欢迎主屏 -->
   <div class="stage active" id="stage-welcome">
     <div class="welcome-content">
       <div class="welcome-diamond">✦</div>
@@ -289,41 +318,56 @@ body::before {
   </footer>
 </div>
 
-<!-- 黑金神秘风格设置弹窗（图六还原，只选择主系统已备注的模型） -->
+<!-- ✦ 彻底废除原生单选！纯黑金高贵自渲染弹窗 ✦ -->
 <div class="mystic-modal-mask" id="mysticSettingsModal">
   <div class="mystic-modal-box">
     <div class="mm-title">✦ 塔罗与星轨设置 ✦</div>
 
-    <div class="mm-row">
+    <!-- 1. 桌面组件开关 -->
+    <div class="mm-group">
       <label class="mm-label">桌面 4 格星象大组件：</label>
-      <select id="setWidgetEnabled" class="mm-select">
-        <option value="true">开启显示（推荐）</option>
-        <option value="false">隐藏组件</option>
-      </select>
+      <div class="custom-drop-header" id="widgetEnabledHeader" onclick="toggleCustomDrop('widgetEnabledMenu')">
+        <span id="widgetEnabledValText">开启显示（推荐）</span>
+        <span class="custom-drop-arrow">▼</span>
+      </div>
+      <div class="custom-drop-menu" id="widgetEnabledMenu">
+        <div class="custom-drop-item selected" data-val="true" onclick="selectDropVal('widgetEnabled', 'true', '开启显示（推荐）')">开启显示（推荐）</div>
+        <div class="custom-drop-item" data-val="false" onclick="selectDropVal('widgetEnabled', 'false', '隐藏组件')">隐藏组件</div>
+      </div>
     </div>
 
-    <div class="mm-row">
+    <!-- 2. 默认抽卡牌阵 -->
+    <div class="mm-group">
       <label class="mm-label">桌面组件默认抽卡牌阵：</label>
-      <select id="setWidgetSpread" class="mm-select">
-        <option value="triple">三张牌阵（时间流 过去·现在·未来）</option>
-        <option value="single">单张牌阵（每日核心启示）</option>
-      </select>
+      <div class="custom-drop-header" id="widgetSpreadHeader" onclick="toggleCustomDrop('widgetSpreadMenu')">
+        <span id="widgetSpreadValText">三张牌阵（过去·现在·未来）</span>
+        <span class="custom-drop-arrow">▼</span>
+      </div>
+      <div class="custom-drop-menu" id="widgetSpreadMenu">
+        <div class="custom-drop-item selected" data-val="triple" onclick="selectDropVal('widgetSpread', 'triple', '三张牌阵（过去·现在·未来）')">三张牌阵（过去·现在·未来）</div>
+        <div class="custom-drop-item" data-val="single" onclick="selectDropVal('widgetSpread', 'single', '单张牌阵（每日核心启示）')">单张牌阵（每日核心启示）</div>
+      </div>
     </div>
 
-    <div class="mm-row">
-      <label class="mm-label">AI 解读接口（自动读取主系统保存的预设）：</label>
-      <select id="setAIProfile" class="mm-select"></select>
+    <!-- 3. AI 预设选择（真实抓取主系统备注模型） -->
+    <div class="mm-group">
+      <label class="mm-label">AI 灵性接口（主系统已保存预设）：</label>
+      <div class="custom-drop-header" id="aiProfileHeader" onclick="toggleCustomDrop('aiProfileMenu')">
+        <span id="aiProfileValText">正在加载接口预设...</span>
+        <span class="custom-drop-arrow">▼</span>
+      </div>
+      <div class="custom-drop-menu" id="aiProfileMenu"></div>
     </div>
 
     <div class="mm-btns">
-      <button class="btn btn-gold" style="padding:6px 16px; font-size:.8rem;" onclick="closeMysticSettings()">取消</button>
-      <button class="btn btn-purple" style="padding:6px 18px; font-size:.8rem;" onclick="saveMysticSettings()">保存设置</button>
+      <button class="btn btn-gold" style="padding:6px 18px; font-size:.82rem;" onclick="closeMysticSettings()">取消</button>
+      <button class="btn btn-purple" style="padding:6px 20px; font-size:.82rem;" onclick="saveMysticSettings()">保存设置</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== 牌库数据与定义 ====================
+// ==================== 牌库数据 ====================
 const MAJOR = [
   { id:0, name:'愚者', img:'0.jpg', up:'纯粹初心·无畏冒险·新的可能', rev:'鲁莽冲动·缺乏方向·天真过头' },
   { id:1, name:'魔术师', img:'1.jpg', up:'显化意志·创造充沛·万事俱备', rev:'才华受阻·沟通断层·缺乏自信' },
@@ -483,7 +527,7 @@ function getActiveAIConfig() {
 async function invokeAIReading() {
   const cfg = getActiveAIConfig();
   if (!cfg.apiKey) {
-    alert('请在主游戏系统设置中配置大模型 API Key！');
+    alert('请在主系统设置中配置大模型 API Key！');
     return;
   }
 
@@ -530,59 +574,106 @@ function resetAll() {
   goStage('welcome');
 }
 
-// 灵性设置弹窗
+// ============================================================
+// ✦ 黑金自渲染下拉交互逻辑（防原生白框） ✦
+// ============================================================
+let pendingConfig = {
+  widgetEnabled: 'true',
+  widgetSpread: 'triple',
+  aiProfileIndex: 'default'
+};
+
+function toggleCustomDrop(menuId) {
+  const target = document.getElementById(menuId);
+  const isOpen = target.classList.contains('open');
+  document.querySelectorAll('.custom-drop-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.custom-drop-header').forEach(h => h.classList.remove('open'));
+  if (!isOpen) {
+    target.classList.add('open');
+    target.previousElementSibling.classList.add('open');
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.mm-group')) {
+    document.querySelectorAll('.custom-drop-menu').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.custom-drop-header').forEach(h => h.classList.remove('open'));
+  }
+});
+
+function selectDropVal(type, val, label) {
+  if (type === 'widgetEnabled') {
+    pendingConfig.widgetEnabled = val;
+    document.getElementById('widgetEnabledValText').textContent = label;
+  } else if (type === 'widgetSpread') {
+    pendingConfig.widgetSpread = val;
+    document.getElementById('widgetSpreadValText').textContent = label;
+  } else if (type === 'aiProfile') {
+    pendingConfig.aiProfileIndex = val;
+    document.getElementById('aiProfileValText').textContent = label;
+  }
+  document.querySelectorAll('.custom-drop-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.custom-drop-header').forEach(h => h.classList.remove('open'));
+}
+
 function openMysticSettings() {
   const modal = document.getElementById('mysticSettingsModal');
   const wEnabled = localStorage.getItem('mcyt_widget_tarot_enabled') !== 'false';
   const wSpread = localStorage.getItem('mcyt_widget_tarot_spread') || 'triple';
 
-  document.getElementById('setWidgetEnabled').value = wEnabled ? 'true' : 'false';
-  document.getElementById('setWidgetSpread').value = wSpread;
+  pendingConfig.widgetEnabled = wEnabled ? 'true' : 'false';
+  pendingConfig.widgetSpread = wSpread;
+  document.getElementById('widgetEnabledValText').textContent = wEnabled ? '开启显示（推荐）' : '隐藏组件';
+  document.getElementById('widgetSpreadValText').textContent = (wSpread === 'triple') ? '三张牌阵（过去·现在·未来）' : '单张牌阵（每日核心启示）';
 
-  // 抓取主游戏保存的 Profiles
-  const profileSelect = document.getElementById('setAIProfile');
-  profileSelect.innerHTML = '';
+  // 🌟 真实抓取主系统已保存的备注配置
+  const menu = document.getElementById('aiProfileMenu');
+  menu.innerHTML = '';
 
   const mainCfg = getActiveAIConfig();
-  let defaultOpt = document.createElement('option');
-  defaultOpt.value = 'default';
-  defaultOpt.textContent = `主系统默认配置 (${mainCfg.model || '未设定'})`;
-  profileSelect.appendChild(defaultOpt);
+  let defaultItem = document.createElement('div');
+  defaultItem.className = 'custom-drop-item';
+  defaultItem.textContent = `主系统正在使用的配置 (${mainCfg.model || '未设定'})`;
+  defaultItem.onclick = () => selectDropVal('aiProfile', 'default', `主系统配置 (${mainCfg.model || '未设定'})`);
+  menu.appendChild(defaultItem);
+
+  let activeLabel = `主系统配置 (${mainCfg.model || '未设定'})`;
 
   try {
     const raw = localStorage.getItem('mcyt_saved_models_v2');
     if (raw) {
       const list = JSON.parse(raw);
-      if (Array.isArray(list)) {
+      if (Array.isArray(list) && list.length) {
         list.forEach((p, idx) => {
-          let opt = document.createElement('option');
-          opt.value = idx.toString();
-          opt.textContent = `备注预设：${p.name || p.model} (${p.model})`;
-          profileSelect.appendChild(opt);
+          let item = document.createElement('div');
+          item.className = 'custom-drop-item';
+          const title = `${p.name || ('配置' + (idx+1))} · ${p.model}`;
+          item.textContent = title;
+          item.onclick = () => selectDropVal('aiProfile', idx.toString(), title);
+          menu.appendChild(item);
         });
       }
     }
   } catch (_) {}
 
+  document.getElementById('aiProfileValText').textContent = activeLabel;
   modal.style.display = 'flex';
 }
+
 function closeMysticSettings() {
   document.getElementById('mysticSettingsModal').style.display = 'none';
 }
+
 function saveMysticSettings() {
-  const wEnabled = document.getElementById('setWidgetEnabled').value === 'true';
-  const wSpread = document.getElementById('setWidgetSpread').value;
-  const pVal = document.getElementById('setAIProfile').value;
+  localStorage.setItem('mcyt_widget_tarot_enabled', pendingConfig.widgetEnabled);
+  localStorage.setItem('mcyt_widget_tarot_spread', pendingConfig.widgetSpread);
 
-  localStorage.setItem('mcyt_widget_tarot_enabled', wEnabled.toString());
-  localStorage.setItem('mcyt_widget_tarot_spread', wSpread);
-
-  if (pVal !== 'default') {
+  if (pendingConfig.aiProfileIndex !== 'default') {
     try {
       const raw = localStorage.getItem('mcyt_saved_models_v2');
       if (raw) {
         const list = JSON.parse(raw);
-        const p = list[parseInt(pVal, 10)];
+        const p = list[parseInt(pendingConfig.aiProfileIndex, 10)];
         if (p) {
           localStorage.setItem('tarot_ai_base_url', p.baseUrl || '');
           localStorage.setItem('tarot_ai_api_key', p.apiKey || '');
@@ -597,7 +688,7 @@ function saveMysticSettings() {
   }
 
   closeMysticSettings();
-  alert('设置已成功同步！');
+  alert('✦ 设置已成功保存，桌面组件已同步！✦');
 }
 </script>
 </body>
