@@ -532,7 +532,7 @@ function showResultReadings() {
 // 自动穿透读取主系统 API 接口
 function getActiveAIConfig() {
   try {
-    const raw = localStorage.getItem('mcyt_ai_config');
+    const raw = localStorage.getItem('mc_yt_ai_config') || localStorage.getItem('mcyt_ai_config');
     if (raw) {
       const p = JSON.parse(raw);
       if (p.apiKey || p.baseUrl) return p;
@@ -658,20 +658,20 @@ function openMysticSettings() {
 
   let activeLabel = `主系统配置 (${mainCfg.model || '未设定'})`;
 
-  // 兼容 mcyt_saved_models 与 mcyt_saved_models_v2
+  // 真实键名为 mcyt_ai_profiles，数据结构为 [{ name, config:{baseUrl,apiKey,model} }]
   let rawList = null;
   try {
-    const raw1 = localStorage.getItem('mcyt_saved_models');
-    const raw2 = localStorage.getItem('mcyt_saved_models_v2');
-    rawList = raw1 ? JSON.parse(raw1) : (raw2 ? JSON.parse(raw2) : null);
+    const raw = localStorage.getItem('mcyt_ai_profiles');
+    rawList = raw ? JSON.parse(raw) : null;
   } catch (_) {}
 
   if (Array.isArray(rawList) && rawList.length) {
     rawList.forEach((p, idx) => {
       let item = document.createElement('div');
       item.className = 'custom-drop-item';
-      const displayName = p.name || p.modelName || p.model || ('预设 ' + (idx + 1));
-      const title = `备注：${displayName} (${p.model || '未知模型'})`;
+      const pModel = (p.config && p.config.model) || '未知模型';
+      const displayName = p.name || pModel || ('预设 ' + (idx + 1));
+      const title = `备注：${displayName} (${pModel})`;
       item.textContent = title;
       item.onclick = () => selectDropVal('aiProfile', idx.toString(), title);
       menu.appendChild(item);
@@ -693,17 +693,17 @@ function saveMysticSettings() {
   if (pendingConfig.aiProfileIndex !== 'default') {
     let rawList = null;
     try {
-      const raw1 = localStorage.getItem('mcyt_saved_models');
-      const raw2 = localStorage.getItem('mcyt_saved_models_v2');
-      rawList = raw1 ? JSON.parse(raw1) : (raw2 ? JSON.parse(raw2) : null);
+      const raw = localStorage.getItem('mcyt_ai_profiles');
+      rawList = raw ? JSON.parse(raw) : null;
     } catch (_) {}
 
     if (Array.isArray(rawList)) {
       const p = rawList[parseInt(pendingConfig.aiProfileIndex, 10)];
-      if (p) {
-        localStorage.setItem('tarot_ai_base_url', p.baseUrl || '');
-        localStorage.setItem('tarot_ai_api_key', p.apiKey || '');
-        localStorage.setItem('tarot_ai_model', p.model || '');
+      const pc = p && p.config;
+      if (pc) {
+        localStorage.setItem('tarot_ai_base_url', pc.baseUrl || '');
+        localStorage.setItem('tarot_ai_api_key', pc.apiKey || '');
+        localStorage.setItem('tarot_ai_model', pc.model || '');
       }
     }
   } else {
