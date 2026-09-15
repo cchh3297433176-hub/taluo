@@ -379,8 +379,12 @@ body::before {
 </div>
 
 <script>
-// ==================== 退出回桌面 ====================
+// ==================== 退出回桌面（写入桌面直达契约） ====================
 function exitToDesktop() {
+  try {
+    sessionStorage.setItem('mcyt_skip_lock_screen', 'true');
+    sessionStorage.setItem('mcyt_return_desktop_page', '1');
+  } catch (_) {}
   if (window.history.length > 1) {
     window.history.back();
   } else {
