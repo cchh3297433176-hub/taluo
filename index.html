@@ -735,7 +735,6 @@ function closeShareTarotModal() {
 }
 
 function doSendTarotToChat(targetId, isGroup, targetName) {
-  const hostEnv = getHostChatEnvironment();
   const sp = SPREADS[appState.spreadKey];
   const userQ = document.getElementById('customQ').value.trim() || '综合每日能量探索';
 
@@ -765,34 +764,20 @@ function doSendTarotToChat(targetId, isGroup, targetName) {
     timestamp: Date.now()
   };
 
+  // 🔮 只负责写入跨沙盒安全队列，交给 chat-tarot.js 的 drainPendingTarotShares 吸收
   let sendSuccess = false;
-
-  if (hostEnv && typeof hostEnv.pushChatMessageSafe === 'function') {
-    const curAcc = (typeof hostEnv.getActiveAccountInfo === 'function') ? hostEnv.getActiveAccountInfo() : { id: 'main', name: '我' };
-    tarotMsg.senderName = curAcc.name || '我';
-    if (isGroup) {
-      if (!hostEnv.G.groupChatHistory) hostEnv.G.groupChatHistory = {};
-      if (!hostEnv.G.groupChatHistory[targetId]) hostEnv.G.groupChatHistory[targetId] = [];
-      hostEnv.G.groupChatHistory[targetId].push(tarotMsg);
-    } else {
-      hostEnv.pushChatMessageSafe(targetId, tarotMsg, curAcc.id);
+  try {
+    let queue = [];
+    const raw = localStorage.getItem('mcyt_pending_shared_tarot');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) queue = parsed;
     }
-    if (typeof hostEnv.autoSaveGame === 'function') hostEnv.autoSaveGame();
+    queue.push({ targetId: targetId, isGroup: !!isGroup, msg: tarotMsg });
+    localStorage.setItem('mcyt_pending_shared_tarot', JSON.stringify(queue));
     sendSuccess = true;
-  } else {
-    // 穿透落地写入 localStorage 的自动存档结构
-    try {
-      const autoRaw = localStorage.getItem('mcyt_autosave');
-      if (autoRaw) {
-        const s = JSON.parse(autoRaw);
-        if (!s.chatHistory) s.chatHistory = {};
-        const histKey = `main_${targetId}`;
-        if (!s.chatHistory[histKey]) s.chatHistory[histKey] = [];
-        s.chatHistory[histKey].push(tarotMsg);
-        localStorage.setItem('mcyt_autosave', JSON.stringify(s));
-        sendSuccess = true;
-      }
-    } catch (_) {}
+  } catch (_) {
+    sendSuccess = false;
   }
 
   closeShareTarotModal();
