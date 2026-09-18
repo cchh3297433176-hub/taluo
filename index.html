@@ -317,6 +317,17 @@ body::before {
       <div style="text-align:center; margin-top:16px;">
         <button class="btn btn-purple" id="btnCallAI" onclick="invokeAIReading()">✦ 召唤 AI 深度解读 ✦</button>
       </div>
+      
+      <!-- 🌟 转发给好友/角色解读功能入口 -->
+      <div style="text-align:center; margin-top:14px;">
+        <button class="btn btn-gold" id="btnShareTarot" onclick="openShareTarotModal()" style="padding:10px 24px; font-size:.85rem;">
+          ✦ 转发给好友解读 ✦
+        </button>
+        <div style="font-size:.72rem; color:rgba(255,255,255,0.45); margin-top:6px; letter-spacing:0.4px;">
+          角色不一定能够准确解读，可能因性格产生独特见解、误读甚至拒绝
+        </div>
+      </div>
+
       <div id="aiTextResult" style="margin-top:14px; font-size:.88rem; color:#f0eae1; line-height:1.9; white-space:pre-wrap;"></div>
     </div>
 
@@ -328,6 +339,22 @@ body::before {
   <footer class="app-footer">
     塔罗牌是自我反思的工具 · 保持开放的心，最终的决策在你手中
   </footer>
+</div>
+
+<!-- ✦ 塔罗转发给好友单选弹窗 ✦ -->
+<div class="mystic-modal-mask" id="shareTarotModal">
+  <div class="mystic-modal-box" style="max-height:85vh; display:flex; flex-direction:column;">
+    <div class="mm-title">✦ 转发牌阵至聊天 ✦</div>
+    <div style="font-size:.78rem; color:var(--text-sub); margin-bottom:10px; text-align:left;">
+      选择一位微信联系人或群聊（发送后保持静止，需进入聊天由你主动开启对话或点击闪电生成）：
+    </div>
+    <div id="shareContactList" style="flex:1; overflow-y:auto; max-height:240px; margin-bottom:14px; padding-right:4px;">
+      <!-- 联系人动态注入 -->
+    </div>
+    <div class="mm-btns">
+      <button class="btn btn-gold" style="padding:6px 18px; font-size:.82rem;" onclick="closeShareTarotModal()">取消</button>
+    </div>
+  </div>
 </div>
 
 <!-- ✦ 彻底废除原生单选！纯黑金高贵自渲染弹窗 ✦ -->
@@ -592,6 +619,188 @@ async function invokeAIReading() {
     out.textContent = '解读发生异常：' + err.message;
   } finally {
     btn.disabled = false;
+  }
+}
+
+// ==================== 🌟 转发牌阵至微信聊天 ====================
+function getHostChatEnvironment() {
+  if (window.parent && window.parent.G && window.parent.G.npcs) {
+    return {
+      G: window.parent.G,
+      pushChatMessageSafe: window.parent.pushChatMessageSafe,
+      getActiveAccountInfo: window.parent.getActiveAccountInfo,
+      autoSaveGame: window.parent.autoSaveGame,
+      isIframe: true
+    };
+  }
+  if (window.G && window.G.npcs) {
+    return {
+      G: window.G,
+      pushChatMessageSafe: window.pushChatMessageSafe,
+      getActiveAccountInfo: window.getActiveAccountInfo,
+      autoSaveGame: window.autoSaveGame,
+      isIframe: false
+    };
+  }
+  return null;
+}
+
+function openShareTarotModal() {
+  if (!appState.drawnCards || !appState.drawnCards.length) {
+    alert('请先完成抽牌！');
+    return;
+  }
+
+  const hostEnv = getHostChatEnvironment();
+  const candidateTargets = [];
+
+  if (hostEnv && hostEnv.G) {
+    const curAcc = (typeof hostEnv.getActiveAccountInfo === 'function') ? hostEnv.getActiveAccountInfo() : { id: 'main' };
+    Object.values(hostEnv.G.npcs || {}).forEach(npc => {
+      if (!npc.ownerAccountId || npc.ownerAccountId === curAcc.id || npc.ownerAccountId === 'all') {
+        candidateTargets.push({
+          id: npc.id,
+          name: npc.remark ? `${npc.remark} (${npc.name})` : npc.name,
+          avatar: npc.avatarUrl || 'assets/icons/chat.png',
+          isGroup: false
+        });
+      }
+    });
+    Object.values(hostEnv.G.groups || {}).forEach(grp => {
+      candidateTargets.push({
+        id: grp.id,
+        name: `[群] ${grp.name}`,
+        avatar: grp.avatarUrl || 'assets/icons/chat.png',
+        isGroup: true
+      });
+    });
+  } else {
+    // 独立页面运行态下从 localStorage 读取自建好友与自动存档备用
+    try {
+      const customRaw = localStorage.getItem('mcyt_wechat_custom_npcs');
+      if (customRaw) {
+        const customs = JSON.parse(customRaw);
+        Object.values(customs).forEach(npc => {
+          candidateTargets.push({
+            id: npc.id,
+            name: npc.remark ? `${npc.remark} (${npc.name})` : npc.name,
+            avatar: npc.avatarUrl || 'assets/icons/chat.png',
+            isGroup: false
+          });
+        });
+      }
+    } catch (_) {}
+    if (!candidateTargets.length) {
+      try {
+        const autoRaw = localStorage.getItem('mcyt_autosave');
+        if (autoRaw) {
+          const s = JSON.parse(autoRaw);
+          if (s.npcs) {
+            Object.values(s.npcs).forEach(npc => {
+              candidateTargets.push({
+                id: npc.id,
+                name: npc.remark ? `${npc.remark} (${npc.name})` : npc.name,
+                avatar: npc.avatarUrl || 'assets/icons/chat.png',
+                isGroup: false
+              });
+            });
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
+  const listEl = document.getElementById('shareContactList');
+  if (!candidateTargets.length) {
+    listEl.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:.82rem;">暂无可接收的微信联系人</div>';
+  } else {
+    listEl.innerHTML = candidateTargets.map(t => `
+      <div onclick="doSendTarotToChat('${t.id}', ${t.isGroup}, '${t.name.replace(/'/g, "\\'")}')" style="display:flex; align-items:center; justify-content:space-between; padding:9px 8px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
+        <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
+          <div style="width:32px; height:32px; border-radius:6px; overflow:hidden; background:#222; flex-shrink:0;">
+            <img src="${t.avatar}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='images/card_back.png';">
+          </div>
+          <span style="font-size:.86rem; color:#f6f2e8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.name}</span>
+        </div>
+        <span style="font-size:.76rem; color:var(--gold-text); font-weight:600; flex-shrink:0; margin-left:6px;">发送 ›</span>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('shareTarotModal').style.display = 'flex';
+}
+
+function closeShareTarotModal() {
+  document.getElementById('shareTarotModal').style.display = 'none';
+}
+
+function doSendTarotToChat(targetId, isGroup, targetName) {
+  const hostEnv = getHostChatEnvironment();
+  const sp = SPREADS[appState.spreadKey];
+  const userQ = document.getElementById('customQ').value.trim() || '综合每日能量探索';
+
+  const cardSummary = appState.drawnCards.map((c, i) => `${sp.pos[i]}:${c.name}(${c.reversed?'逆':'正'})`).join(' / ');
+
+  const tarotMsg = {
+    _id: 'tarot_' + Date.now(),
+    from: 'player',
+    isPlayer: true,
+    senderName: '我',
+    type: 'shared_tarot',
+    text: `[分享了塔罗牌阵] 【${sp.name}】${cardSummary}`,
+    sharedTarot: {
+      question: userQ,
+      spreadKey: appState.spreadKey,
+      spreadName: sp.name,
+      cards: appState.drawnCards.map((c, i) => ({
+        position: sp.pos[i],
+        name: c.name,
+        reversed: c.reversed,
+        meaning: c.reversed ? c.rev : c.up,
+        img: c.img
+      })),
+      time: new Date().toLocaleTimeString().slice(0, 5)
+    },
+    time: new Date().toLocaleTimeString().slice(0, 5),
+    timestamp: Date.now()
+  };
+
+  let sendSuccess = false;
+
+  if (hostEnv && typeof hostEnv.pushChatMessageSafe === 'function') {
+    const curAcc = (typeof hostEnv.getActiveAccountInfo === 'function') ? hostEnv.getActiveAccountInfo() : { id: 'main', name: '我' };
+    tarotMsg.senderName = curAcc.name || '我';
+    if (isGroup) {
+      if (!hostEnv.G.groupChatHistory) hostEnv.G.groupChatHistory = {};
+      if (!hostEnv.G.groupChatHistory[targetId]) hostEnv.G.groupChatHistory[targetId] = [];
+      hostEnv.G.groupChatHistory[targetId].push(tarotMsg);
+    } else {
+      hostEnv.pushChatMessageSafe(targetId, tarotMsg, curAcc.id);
+    }
+    if (typeof hostEnv.autoSaveGame === 'function') hostEnv.autoSaveGame();
+    sendSuccess = true;
+  } else {
+    // 穿透落地写入 localStorage 的自动存档结构
+    try {
+      const autoRaw = localStorage.getItem('mcyt_autosave');
+      if (autoRaw) {
+        const s = JSON.parse(autoRaw);
+        if (!s.chatHistory) s.chatHistory = {};
+        const histKey = `main_${targetId}`;
+        if (!s.chatHistory[histKey]) s.chatHistory[histKey] = [];
+        s.chatHistory[histKey].push(tarotMsg);
+        localStorage.setItem('mcyt_autosave', JSON.stringify(s));
+        sendSuccess = true;
+      }
+    } catch (_) {}
+  }
+
+  closeShareTarotModal();
+
+  if (sendSuccess) {
+    alert(`✦ 已成功将牌阵转发给「${targetName}」！\n转发后保持静止，请进入微信聊天向对方发消息或点击闪电生成解读。`);
+  } else {
+    alert('转发写入失败，请检查游戏数据存档！');
   }
 }
 
