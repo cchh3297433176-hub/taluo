@@ -406,12 +406,28 @@ body::before {
 </div>
 
 <script>
-// ==================== 退出回桌面（写入桌面直达契约） ====================
+// ==================== 退出回桌面（双向安全协议：秒级通知宿主，杜绝页面重载闪白） ====================
 function exitToDesktop() {
   try {
     sessionStorage.setItem('mcyt_skip_lock_screen', 'true');
     sessionStorage.setItem('mcyt_return_desktop_page', '1');
   } catch (_) {}
+
+  // 🌟 1. 优先识别当前是否寄宿在小手机宿主 iframe 沙盒内
+  const isInsideHostSandbox = (window.parent && window.parent !== window);
+  if (isInsideHostSandbox) {
+    try {
+      // 触发多通道 postMessage，通知外壳立即平滑收起
+      window.parent.postMessage('CLOSE_SANDBOX', '*');
+      window.parent.postMessage({ type: 'CLOSE_SANDBOX', action: 'closeSandbox' }, '*');
+      if (typeof window.parent.closeInAppSandbox === 'function') {
+        window.parent.closeInAppSandbox();
+      }
+      return; // 立即阻断后续代码，严禁继续执行 history.back 或 location.href！
+    } catch (_) {}
+  }
+
+  // 🌟 2. 独立窗口浏览器模式下的安全回退兜底
   if (window.history.length > 1) {
     window.history.back();
   } else {
